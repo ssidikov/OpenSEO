@@ -133,9 +133,8 @@ export const AiChatDrawer: React.FC<AiChatDrawerProps> = ({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
-  // Helper to parse inline Markdown (**bold**, *italic*, `inline code`)
+  // Helper to parse inline Markdown (**bold**, `code`)
   const parseInlineMarkdown = (text: string): React.ReactNode[] => {
-    // Regex matching inline code, bold, or italic
     const regex = /(`[^`]+`|\*\*[^*]+\*\*|\*[^*]+\*)/g;
     const parts = text.split(regex);
 
@@ -248,15 +247,9 @@ export const AiChatDrawer: React.FC<AiChatDrawerProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden flex justify-end items-center sm:p-4">
-      {/* Backdrop */}
-      <div 
-        onClick={onClose} 
-        className="fixed inset-0 bg-slate-950/20 backdrop-blur-xs transition-opacity duration-200 animate-fade-in" 
-      />
-
-      {/* Bounded Floating Drawer Container */}
-      <div className="relative w-full sm:w-[460px] md:w-[500px] h-full sm:h-[min(630px,calc(100vh-3rem))] bg-white/95 backdrop-blur-2xl shadow-2xl flex flex-col border border-slate-200/90 sm:rounded-3xl overflow-hidden animate-fade-in">
+    <div className="fixed bottom-0 right-0 sm:bottom-20 sm:right-6 z-50 flex flex-col pointer-events-auto max-w-full">
+      {/* Floating Panel Container */}
+      <div className="relative w-full sm:w-[440px] md:w-[480px] h-[100vh] sm:h-[min(560px,calc(100vh-6rem))] bg-white/95 backdrop-blur-2xl shadow-2xl flex flex-col border border-slate-200/90 sm:rounded-3xl overflow-hidden animate-fade-in">
         {/* Header */}
         <div className="px-4 py-3.5 border-b border-slate-200/80 flex items-center justify-between bg-slate-50/80 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-2.5">

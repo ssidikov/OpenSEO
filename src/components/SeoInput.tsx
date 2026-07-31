@@ -1,113 +1,109 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { Search, Globe, ArrowRight, Loader2, Sparkles } from "lucide-react";
+import React, { useState } from 'react'
+import { Search, Globe, ArrowRight, Loader2, Sparkles } from 'lucide-react'
 
 interface SeoInputProps {
-  onAnalyze: (url: string) => void;
-  isLoading: boolean;
+  onAnalyze: (url: string) => void
+  isLoading: boolean
 }
 
 export function formatUrlInput(raw: string): string {
-  let cleaned = raw.trim();
-  if (!cleaned) return "";
+  let cleaned = raw.trim()
+  if (!cleaned) return ''
 
   // Prepend https:// if missing
   if (!/^https?:\/\//i.test(cleaned)) {
-    cleaned = `https://${cleaned}`;
+    cleaned = `https://${cleaned}`
   }
 
   try {
-    const parsed = new URL(cleaned);
+    const parsed = new URL(cleaned)
     // Remove trailing slash for root domain URLs (e.g. https://bahor.fr/ -> https://bahor.fr)
-    if (parsed.pathname === "/" && !parsed.search && !parsed.hash) {
-      return `${parsed.protocol}//${parsed.host}`;
+    if (parsed.pathname === '/' && !parsed.search && !parsed.hash) {
+      return `${parsed.protocol}//${parsed.host}`
     }
-    return parsed.href;
+    return parsed.href
   } catch {
-    return cleaned;
+    return cleaned
   }
 }
 
 export const SeoInput: React.FC<SeoInputProps> = ({ onAnalyze, isLoading }) => {
-  const [url, setUrl] = useState("");
-  const [error, setError] = useState("");
+  const [url, setUrl] = useState('')
+  const [error, setError] = useState('')
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!url.trim()) {
-      setError("Please enter a website URL");
-      return;
+      setError('Please enter a website URL')
+      return
     }
-    setError("");
-    const formatted = formatUrlInput(url);
-    onAnalyze(formatted);
-  };
+    setError('')
+    const formatted = formatUrlInput(url)
+    onAnalyze(formatted)
+  }
 
   const handlePreset = (presetUrl: string) => {
-    setUrl(presetUrl);
-    setError("");
-    onAnalyze(presetUrl);
-  };
+    setUrl(presetUrl)
+    setError('')
+    onAnalyze(presetUrl)
+  }
 
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col items-center">
-      <form onSubmit={handleSubmit} className="w-full relative group">
-        <div className="relative flex items-center liquid-glass-input rounded-2xl p-2 pl-4 border border-slate-200/90 shadow-glass">
-          <Globe className="w-5 h-5 text-slate-400 mr-3 shrink-0" />
+    <div className='w-full max-w-2xl mx-auto flex flex-col items-center'>
+      <form onSubmit={handleSubmit} className='w-full relative group'>
+        <div className='relative flex items-center liquid-glass-input rounded-2xl p-2 pl-4 border border-slate-200/90 shadow-glass'>
+          <Globe className='w-5 h-5 text-slate-400 mr-3 shrink-0' />
           <input
-            type="text"
+            type='text'
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter website URL (e.g. bahor.fr or vercel.com)"
+            placeholder='Enter website URL (e.g. apple.com or vercel.com)'
             disabled={isLoading}
-            className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-base focus:outline-none py-2 pr-2"
+            className='w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-base focus:outline-none py-2 pr-2'
           />
           <button
-            type="submit"
+            type='submit'
             disabled={isLoading}
-            className="shrink-0 flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-medium text-sm shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed"
-          >
+            className='shrink-0 flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white font-medium text-sm shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 active:scale-[0.98] transition-all disabled:opacity-70 disabled:cursor-not-allowed'>
             {isLoading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className='w-4 h-4 animate-spin' />
                 <span>Auditing...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4 text-blue-200" />
+                <Sparkles className='w-4 h-4 text-blue-200' />
                 <span>Analyze Site</span>
-                <ArrowRight className="w-4 h-4 ml-0.5" />
+                <ArrowRight className='w-4 h-4 ml-0.5' />
               </>
             )}
           </button>
         </div>
 
         {error && (
-          <p className="absolute -bottom-6 left-4 text-xs font-medium text-red-500">
-            {error}
-          </p>
+          <p className='absolute -bottom-6 left-4 text-xs font-medium text-red-500'>{error}</p>
         )}
       </form>
 
-      <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
-        <span className="text-xs text-slate-400 font-medium">Try instant demo:</span>
+      <div className='flex flex-wrap items-center justify-center gap-2 mt-6'>
+        <span className='text-xs text-slate-400 font-medium'>Try instant demo:</span>
         {[
-          { name: "bahor.fr", url: "https://bahor.fr" },
-          { name: "vercel.com", url: "https://vercel.com" },
-          { name: "nextjs.org", url: "https://nextjs.org" },
+          { name: 'apple.com', url: 'https://apple.com' },
+          { name: 'vercel.com', url: 'https://vercel.com' },
+          { name: 'nextjs.org', url: 'https://nextjs.org' },
         ].map((preset) => (
           <button
             key={preset.name}
-            type="button"
+            type='button'
             onClick={() => handlePreset(preset.url)}
             disabled={isLoading}
-            className="px-3 py-1 rounded-full text-xs font-medium text-slate-600 bg-white/80 hover:bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-sm transition-all disabled:opacity-50"
-          >
+            className='px-3 py-1 rounded-full text-xs font-medium text-slate-600 bg-white/80 hover:bg-slate-100 border border-slate-200/80 shadow-xs hover:shadow-sm transition-all disabled:opacity-50'>
             {preset.name}
           </button>
         ))}
       </div>
     </div>
-  );
-};
+  )
+}

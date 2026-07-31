@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bot, Copy, Check, Sparkles, RefreshCw, MessageSquare, AlertCircle, AlertTriangle, Zap, CheckCircle2, ArrowRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Bot, Copy, Check, Sparkles, RefreshCw, MessageSquare, AlertCircle, AlertTriangle, Zap, CheckCircle2, Terminal } from "lucide-react";
 
 interface AiSummaryCardProps {
   summary: string | null;
@@ -9,6 +9,75 @@ interface AiSummaryCardProps {
   onRefreshSummary: () => void;
   onOpenChat: () => void;
 }
+
+// Claude Code Style AI Agent Loading Component
+const ClaudeThinkingLoader: React.FC = () => {
+  const [stepIndex, setStepIndex] = useState(0);
+  const [seconds, setSeconds] = useState(0.0);
+
+  const thinkingSteps = [
+    { label: "Inspecting metadata & OpenGraph tags...", tool: "parse_meta" },
+    { label: "Auditing heading hierarchy & content depth...", tool: "audit_structure" },
+    { label: "Evaluating crawlability & robots.txt rules...", tool: "check_technical" },
+    { label: "Synthesizing high-impact recommendations...", tool: "ai_synthesis" },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSeconds((prev) => parseFloat((prev + 0.1).toFixed(1)));
+    }, 100);
+
+    const stepInterval = setInterval(() => {
+      setStepIndex((prev) => (prev + 1) % thinkingSteps.length);
+    }, 1200);
+
+    return () => {
+      clearInterval(timer);
+      clearInterval(stepInterval);
+    };
+  }, []);
+
+  const currentStep = thinkingSteps[stepIndex];
+
+  return (
+    <div className="my-2 rounded-2xl bg-slate-950 text-slate-100 font-mono border border-slate-800 shadow-xl overflow-hidden relative p-4 sm:p-5 animate-fade-in">
+      <div className="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3 text-xs">
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+          </div>
+          <span className="text-slate-400 text-[11px] font-sans font-semibold ml-2 flex items-center gap-1.5">
+            <Terminal className="w-3.5 h-3.5 text-amber-400" />
+            Claude Agent Executing
+          </span>
+        </div>
+
+        <div className="flex items-center gap-2 text-[11px]">
+          <span className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-amber-400 font-bold">
+            {seconds.toFixed(1)}s
+          </span>
+        </div>
+      </div>
+
+      <div className="space-y-2.5 text-xs">
+        <div className="flex items-center gap-2.5 text-amber-400">
+          <span className="animate-spin text-amber-400 text-sm">✽</span>
+          <span className="font-semibold text-slate-200">Thinking...</span>
+          <span className="text-[10px] text-slate-500 bg-slate-900 border border-slate-800 px-1.5 py-0.5 rounded font-mono">
+            {currentStep.tool}
+          </span>
+        </div>
+
+        <div className="pl-6 flex items-center gap-2 text-slate-300 text-[12px]">
+          <span className="text-amber-400 font-bold">❯</span>
+          <span className="animate-pulse">{currentStep.label}</span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const AiSummaryCard: React.FC<AiSummaryCardProps> = ({
   summary,
@@ -71,13 +140,12 @@ export const AiSummaryCard: React.FC<AiSummaryCardProps> = ({
         return;
       }
 
-      // Section Titles like **Key Audit Findings:** or **High Impact Recommendations:**
       if (line.startsWith("**Key Audit Findings") || line.startsWith("Key Audit Findings")) {
-        return; // Handled dynamically by section
+        return;
       }
 
       if (line.startsWith("**High Impact Recommendations") || line.startsWith("High Impact Recommendations")) {
-        return; // Handled dynamically by section
+        return;
       }
 
       // Bullet findings (- 🚨 0 Critical Issues, - ⚠️ 2 Warnings, etc.)
@@ -115,7 +183,6 @@ export const AiSummaryCard: React.FC<AiSummaryCardProps> = ({
         return;
       }
 
-      // Regular paragraph text
       currentParagraphs.push(line);
     });
 
@@ -272,12 +339,7 @@ export const AiSummaryCard: React.FC<AiSummaryCardProps> = ({
 
       {/* Body */}
       {isLoading ? (
-        <div className="py-12 flex flex-col items-center justify-center gap-3">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full border-2 border-blue-200 border-t-blue-600 animate-spin" />
-          </div>
-          <p className="text-xs text-slate-500 font-medium">Synthesizing SEO report with AI Agent...</p>
-        </div>
+        <ClaudeThinkingLoader />
       ) : summary ? (
         renderSummaryContent(summary)
       ) : (

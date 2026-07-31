@@ -224,15 +224,6 @@ export const Dashboard: React.FC<DashboardProps> = ({
         </div>
       </div>
 
-      {/* Floating AI Chat Button */}
-      <button
-        onClick={() => setIsChatOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all"
-      >
-        <MessageSquare className="w-4 h-4" />
-        <span>Chat with AI Agent</span>
-      </button>
-
       {/* AI Chat Drawer */}
       <AiChatDrawer
         isOpen={isChatOpen}
