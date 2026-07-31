@@ -42,7 +42,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onNewSearch }) => {
           )}
 
           <a
-            href="https://github.com"
+            href="https://github.com/ssidikov/OpenSEO"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-slate-700 bg-white/80 hover:bg-slate-50 border border-slate-200/80 shadow-xs hover:shadow-sm transition-all"

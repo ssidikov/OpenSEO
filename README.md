@@ -2,7 +2,7 @@
 
 > **Open-Source Next.js AI Agent Web SEO Analyzer & Audit Engine**
 
-OpenSEO is a modern, open-source web application designed to perform automated technical SEO audits, generate AI executive summaries, and provide an interactive streaming AI assistant for resolving SEO issues and generating Schema.org code snippets.
+OpenSEO is a free-to-use online tool designed to check and audit the technical SEO of any website. Powered by an AI agent engine, it performs automated SEO audits, generates AI executive summaries, and provides an interactive streaming AI assistant for resolving SEO issues and generating Schema.org code snippets.
 
 Built with **Next.js 16 (App Router & Turbopack)**, **React 19**, **TypeScript**, **Tailwind CSS (Apple-style Liquid Glass Design)**, and **Vercel AI SDK**.
 
@@ -44,7 +44,7 @@ Built with **Next.js 16 (App Router & Turbopack)**, **React 19**, **TypeScript**
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/YOUR_USERNAME/OpenSEO.git
+git clone https://github.com/ssidikov/OpenSEO.git
 cd OpenSEO
 ```
 
