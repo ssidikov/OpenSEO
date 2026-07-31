@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { openai, createOpenAI } from "@ai-sdk/openai";
 import { SeoReport } from "@/types/seo";
 
 export async function POST(req: NextRequest) {
@@ -12,7 +12,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing SEO report." }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+    const apiKey =
+      process.env.OPENROUTER_API_KEY ||
+      process.env.GEMINI_API_KEY ||
+      process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       // Local AI template summary generator when no API key is configured
@@ -34,7 +37,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ summary: summaryText });
     }
 
-    // Call AI provider if API key present
     const prompt = `You are a world-class Senior SEO Consultant and AI Specialist. Analyze the following structured web SEO report and provide a concise, high-impact Executive Summary in Markdown:
     
 Domain: ${report.domain}
@@ -48,9 +50,23 @@ Provide:
 2. Top 3 Highest Impact Action Items (bulleted with bold titles and exact code fix instructions)
 3. Strategic Growth Opportunity (1 sentence)`;
 
-    const model = process.env.GEMINI_API_KEY
-      ? google("gemini-1.5-flash")
-      : openai("gpt-4o-mini");
+    let model;
+    if (process.env.OPENROUTER_API_KEY) {
+      const openrouter = createOpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENROUTER_API_KEY,
+        headers: {
+          "HTTP-Referer": "https://openseo.dev",
+          "X-Title": "OpenSEO AI Agent",
+        },
+      });
+      const selectedModel = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.1-8b-instruct:free";
+      model = openrouter(selectedModel);
+    } else if (process.env.GEMINI_API_KEY) {
+      model = google("gemini-1.5-flash");
+    } else {
+      model = openai("gpt-4o-mini");
+    }
 
     const { text } = await generateText({
       model,

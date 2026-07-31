@@ -4,18 +4,13 @@ import React, { useState } from "react";
 import { Navbar } from "@/components/Navbar";
 import { SeoInput } from "@/components/SeoInput";
 import { Dashboard } from "@/components/Dashboard";
+import { StickyChatWidget } from "@/components/StickyChatWidget";
 import { SeoReport } from "@/types/seo";
 import { 
   Sparkles, 
   Bot, 
-  Search, 
-  BarChart3, 
   ShieldCheck, 
-  Code2, 
   Zap,
-  CheckCircle2,
-  ArrowRight,
-  Globe
 } from "lucide-react";
 
 export default function Home() {
@@ -80,7 +75,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FBFBFD] text-slate-900 font-sans flex flex-col antialiased">
+    <div className="min-h-screen bg-[#FBFBFD] text-slate-900 font-sans flex flex-col antialiased relative">
       <Navbar onNewSearch={report ? () => setReport(null) : undefined} />
 
       <main className="flex-1">
@@ -179,6 +174,9 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Global Sticky AI Chatbot Widget */}
+      <StickyChatWidget seoReport={report} />
     </div>
   );
 }

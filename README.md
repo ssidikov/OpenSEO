@@ -18,11 +18,12 @@ Built with **Next.js 16 (App Router & Turbopack)**, **React 19**, **TypeScript**
   - **Crawlability & Security**: `HTTPS` protocol check, `/robots.txt` detection, `/sitemap.xml` detection, and page load latency.
 - 📊 **Categorized Scoring System**: Computes an overall health score (0–100) with categorized deductions and severity badges (Critical, Warning, Passed).
 - 🤖 **Interactive AI Assistant**:
-  - Slide-over chat drawer to ask questions about your specific audit report.
+  - Bounded floating chat drawer to ask questions about your specific audit report.
   - One-click code generation for **Schema.org JSON-LD**, Next.js `<title>`/`<meta>` tags, and missing image alt fixes.
-- 🔄 **Dual AI Engine Support**:
+- 🔄 **Multi-Provider AI Engine (OpenRouter Free Models, Gemini, OpenAI)**:
   - **Free Built-in Engine**: Works out-of-the-box with **0 configuration** and **$0 API cost**.
-  - **Live LLM Integration**: Optionally add Google Gemini (`GEMINI_API_KEY`) or OpenAI (`OPENAI_API_KEY`) for live generative AI streaming.
+  - **OpenRouter Free Models**: Connect `OPENROUTER_API_KEY` to stream 100% free models like `meta-llama/llama-3.1-8b-instruct:free` or `google/gemma-2-9b-it:free`.
+  - **Google Gemini / OpenAI**: Support for `GEMINI_API_KEY` or `OPENAI_API_KEY`.
 - 📁 **JSON Export**: One-click download of structured audit reports for client reporting.
 
 ---
@@ -35,7 +36,7 @@ Built with **Next.js 16 (App Router & Turbopack)**, **React 19**, **TypeScript**
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **DOM Parser**: [Cheerio](https://cheerio.js.org/)
-- **AI Engine**: [Vercel AI SDK](https://sdk.vercel.ai/docs) (`ai`, `@ai-sdk/google`, `@ai-sdk/openai`)
+- **AI Engine**: [Vercel AI SDK](https://sdk.vercel.ai/docs) (`ai`, `@ai-sdk/openai`, `@ai-sdk/google`)
 
 ---
 
@@ -64,13 +65,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 OpenSEO runs 100% free out-of-the-box without an API key. 
 
-If you wish to enable live Gemini or OpenAI generative streaming, create a `.env.local` file in the project root:
+If you wish to enable OpenRouter (including **free models**), Google Gemini, or OpenAI live streaming, create a `.env.local` file:
 
 ```env
-# Optional: Google Gemini API Key
+# Option 1: OpenRouter (Supports free models like meta-llama/llama-3.1-8b-instruct:free)
+OPENROUTER_API_KEY=your_openrouter_api_key_here
+# Optional model override (Defaults to meta-llama/llama-3.1-8b-instruct:free)
+OPENROUTER_MODEL=meta-llama/llama-3.1-8b-instruct:free
+
+# Option 2: Google Gemini API Key
 GEMINI_API_KEY=your_gemini_api_key_here
 
-# OR Optional: OpenAI API Key
+# Option 3: OpenAI API Key
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
@@ -80,7 +86,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 1. Push your repository to GitHub.
 2. Import the project into [Vercel](https://vercel.com/new).
-3. *(Optional)* Add `GEMINI_API_KEY` or `OPENAI_API_KEY` in Environment Variables.
+3. *(Optional)* Add `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, or `OPENAI_API_KEY` in Environment Variables.
 4. Click **Deploy**.
 
 ---

@@ -8,6 +8,27 @@ interface SeoInputProps {
   isLoading: boolean;
 }
 
+export function formatUrlInput(raw: string): string {
+  let cleaned = raw.trim();
+  if (!cleaned) return "";
+
+  // Prepend https:// if missing
+  if (!/^https?:\/\//i.test(cleaned)) {
+    cleaned = `https://${cleaned}`;
+  }
+
+  try {
+    const parsed = new URL(cleaned);
+    // Remove trailing slash for root domain URLs (e.g. https://bahor.fr/ -> https://bahor.fr)
+    if (parsed.pathname === "/" && !parsed.search && !parsed.hash) {
+      return `${parsed.protocol}//${parsed.host}`;
+    }
+    return parsed.href;
+  } catch {
+    return cleaned;
+  }
+}
+
 export const SeoInput: React.FC<SeoInputProps> = ({ onAnalyze, isLoading }) => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState("");
@@ -19,7 +40,8 @@ export const SeoInput: React.FC<SeoInputProps> = ({ onAnalyze, isLoading }) => {
       return;
     }
     setError("");
-    onAnalyze(url.trim());
+    const formatted = formatUrlInput(url);
+    onAnalyze(formatted);
   };
 
   const handlePreset = (presetUrl: string) => {
@@ -37,7 +59,7 @@ export const SeoInput: React.FC<SeoInputProps> = ({ onAnalyze, isLoading }) => {
             type="text"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder="Enter website URL (e.g. vercel.com or stripe.com)"
+            placeholder="Enter website URL (e.g. bahor.fr or vercel.com)"
             disabled={isLoading}
             className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 text-base focus:outline-none py-2 pr-2"
           />
@@ -71,9 +93,9 @@ export const SeoInput: React.FC<SeoInputProps> = ({ onAnalyze, isLoading }) => {
       <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
         <span className="text-xs text-slate-400 font-medium">Try instant demo:</span>
         {[
+          { name: "bahor.fr", url: "https://bahor.fr" },
           { name: "vercel.com", url: "https://vercel.com" },
           { name: "nextjs.org", url: "https://nextjs.org" },
-          { name: "stripe.com", url: "https://stripe.com" },
         ].map((preset) => (
           <button
             key={preset.name}

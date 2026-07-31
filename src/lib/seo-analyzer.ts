@@ -1,13 +1,32 @@
 import * as cheerio from "cheerio";
 import { SeoIssue, SeoReport, SeoMetrics, SeoCategoryResult } from "@/types/seo";
 
+export function normalizeUrlInput(input: string): string {
+  let cleaned = input.trim();
+  if (!cleaned) return "";
+
+  // Prepend https:// if no scheme is provided
+  if (!/^https?:\/\//i.test(cleaned)) {
+    cleaned = `https://${cleaned}`;
+  }
+
+  try {
+    const parsed = new URL(cleaned);
+    // Remove trailing slash for root domain URLs (e.g. https://bahor.fr/ -> https://bahor.fr)
+    if (parsed.pathname === "/" && !parsed.search && !parsed.hash) {
+      return `${parsed.protocol}//${parsed.host}`;
+    }
+    return parsed.href;
+  } catch {
+    return cleaned;
+  }
+}
+
 export async function analyzeWebsite(targetUrl: string): Promise<SeoReport> {
   // Normalize URL
   let parsedUrl: URL;
   try {
-    const formatted = targetUrl.startsWith("http://") || targetUrl.startsWith("https://")
-      ? targetUrl
-      : `https://${targetUrl}`;
+    const formatted = normalizeUrlInput(targetUrl);
     parsedUrl = new URL(formatted);
   } catch {
     throw new Error("Invalid URL provided. Please enter a valid web address.");
@@ -15,7 +34,7 @@ export async function analyzeWebsite(targetUrl: string): Promise<SeoReport> {
 
   const startTime = Date.now();
   
-  // Fetch HTML content with timeout
+  // Fetch HTML content with timeout & follow redirects
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 12000);
 
@@ -30,6 +49,19 @@ export async function analyzeWebsite(targetUrl: string): Promise<SeoReport> {
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
+    
+    // Update parsedUrl if redirected
+    if (response.url) {
+      try {
+        const redirected = new URL(response.url);
+        if (redirected.pathname === "/" && !redirected.search && !redirected.hash) {
+          parsedUrl = new URL(`${redirected.protocol}//${redirected.host}`);
+        } else {
+          parsedUrl = redirected;
+        }
+      } catch {}
+    }
+
     html = await response.text();
   } catch (err: any) {
     clearTimeout(timeoutId);

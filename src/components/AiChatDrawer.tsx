@@ -85,7 +85,25 @@ export const AiChatDrawer: React.FC<AiChatDrawerProps> = ({
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
-          const chunk = decoder.decode(value, { stream: true });
+          let chunk = decoder.decode(value, { stream: true });
+
+          // Defensive cleanup if chunk contains Vercel AI protocol prefixes (0:"...", e:{...})
+          if (/^[0-9]+:"/m.test(chunk)) {
+            chunk = chunk
+              .split("\n")
+              .map((line) => {
+                const match = line.match(/^[0-9]+:"(.*)"$/);
+                if (match) {
+                  return match[1]
+                    .replace(/\\n/g, "\n")
+                    .replace(/\\"/g, '"')
+                    .replace(/\\\\/g, "\\");
+                }
+                return "";
+              })
+              .join("");
+          }
+
           assistantMsgContent += chunk;
 
           setMessages((prev) =>

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { streamText } from "ai";
 import { google } from "@ai-sdk/google";
-import { openai } from "@ai-sdk/openai";
+import { openai, createOpenAI } from "@ai-sdk/openai";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +11,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid messages array" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY || process.env.OPENAI_API_KEY;
+    const apiKey =
+      process.env.OPENROUTER_API_KEY ||
+      process.env.GEMINI_API_KEY ||
+      process.env.OPENAI_API_KEY;
 
     if (!apiKey) {
       // Fallback AI simulation stream when environment variable API key is not set
@@ -20,7 +23,7 @@ export async function POST(req: NextRequest) {
       const score = seoReport?.overallScore || 85;
 
       let reply = `Based on the OpenSEO report for **${domain}** (Current Score: ${score}/100):\n\n`;
-      
+
       if (lastMessage.toLowerCase().includes("title") || lastMessage.toLowerCase().includes("meta")) {
         reply += `Here is an optimized title and description snippet tailored for **${domain}**:\n\n` +
           `\`\`\`html\n<title>${domain} | Leading Solutions & Digital Excellence</title>\n<meta name="description" content="Discover ${domain}'s premier platform built for speed, performance, and user satisfaction. Explore features today." />\n\`\`\`\n\n` +
@@ -61,13 +64,28 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Direct AI Provider stream
     const systemPrompt = `You are OpenSEO AI Agent, an expert SEO engineer and web architect. You have full context of the user's website SEO report: ${JSON.stringify(seoReport)}.
 Answer user queries concisely, provide actionable code snippets in Markdown (HTML, Next.js metadata, Schema.org), and explain SEO concepts clearly.`;
 
-    const model = process.env.GEMINI_API_KEY
-      ? google("gemini-1.5-flash")
-      : openai("gpt-4o-mini");
+    let model;
+    if (process.env.OPENROUTER_API_KEY) {
+      // OpenRouter Provider with free model support
+      const openrouter = createOpenAI({
+        baseURL: "https://openrouter.ai/api/v1",
+        apiKey: process.env.OPENROUTER_API_KEY,
+        headers: {
+          "HTTP-Referer": "https://openseo.dev",
+          "X-Title": "OpenSEO AI Agent",
+        },
+      });
+      // Default to high-performing free model meta-llama/llama-3.1-8b-instruct:free
+      const selectedModel = process.env.OPENROUTER_MODEL || "meta-llama/llama-3.1-8b-instruct:free";
+      model = openrouter(selectedModel);
+    } else if (process.env.GEMINI_API_KEY) {
+      model = google("gemini-1.5-flash");
+    } else {
+      model = openai("gpt-4o-mini");
+    }
 
     const result = await streamText({
       model,
@@ -75,7 +93,7 @@ Answer user queries concisely, provide actionable code snippets in Markdown (HTM
       messages,
     });
 
-    return result.toDataStreamResponse();
+    return result.toTextStreamResponse();
   } catch (err: any) {
     console.error("AI Chat Error:", err);
     return NextResponse.json({ error: err.message || "Failed to process chat" }, { status: 500 });
