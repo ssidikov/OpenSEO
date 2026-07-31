@@ -30,17 +30,17 @@ export async function POST(req: NextRequest) {
           `\`\`\`html\n<script type="application/ld+json">\n{\n  "@context": "https://schema.org",\n  "@type": "Organization",\n  "name": "${domain}",\n  "url": "https://${domain}",\n  "logo": "https://${domain}/logo.png"\n}\n</script>\n\`\`\``;
       } else if (lastMessage.toLowerCase().includes("fix") || lastMessage.toLowerCase().includes("critical") || lastMessage.toLowerCase().includes("issue")) {
         reply += `To fix your top critical issues on **${domain}**:\n\n` +
-          `1. **H1 Tag Alignment**: Add a single primary \`<h1>\` tag in your hero section.\n` +
-          `2. **Image Alt Text**: Ensure all \`<img>\` elements contain non-empty \`alt="..."\` strings.\n` +
-          `3. **Robots & Sitemap**: Serve a \`/sitemap.xml\` file at your root directory.\n\n` +
+          `- **H1 Tag Alignment**: Add a single primary \`<h1>\` tag in your hero section.\n` +
+          `- **Image Alt Text**: Ensure all \`<img>\` elements contain non-empty \`alt="..."\` strings.\n` +
+          `- **Robots & Sitemap**: Serve a \`/sitemap.xml\` file at your root directory.\n\n` +
           `Would you like me to write a custom Next.js metadata script or HTML code block for any of these?`;
       } else {
         reply += `I analyzed the audit data for **${domain}**. ` +
           `You currently have **${seoReport?.allIssues?.filter((i: any) => i.severity === 'critical')?.length || 0} critical issues** and **${seoReport?.allIssues?.filter((i: any) => i.severity === 'warning')?.length || 0} warnings**.\n\n` +
           `Ask me anything! For instance:\n` +
-          `- *"Generate a Schema.org JSON-LD snippet for my page"* \n` +
-          `- *"Write an optimized meta title and description"* \n` +
-          `- *"How do I fix missing H1 tags in Next.js?"*`;
+          `- Generate a Schema.org JSON-LD snippet for my page\n` +
+          `- Write an optimized meta title and description\n` +
+          `- How do I fix missing H1 tags in Next.js?`;
       }
 
       // Stream text response
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
           const chunks = reply.split(" ");
           for (const chunk of chunks) {
             controller.enqueue(encoder.encode(chunk + " "));
-            await new Promise((resolve) => setTimeout(resolve, 30));
+            await new Promise((resolve) => setTimeout(resolve, 25));
           }
           controller.close();
         },
