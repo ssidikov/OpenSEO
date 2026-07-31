@@ -57,7 +57,14 @@ export default function Home() {
         body: JSON.stringify({ url }),
       });
 
-      const data = await response.json();
+      let data: any;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        throw new Error(text || `Server returned HTTP status ${response.status}`);
+      }
 
       if (!response.ok) {
         throw new Error(data.error || "Failed to analyze website.");
@@ -92,7 +99,7 @@ export default function Home() {
               <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-slate-900 leading-[1.1] mb-6">
                 Automated Technical SEO. <br />
                 <span className="bg-gradient-to-r from-blue-600 via-sky-600 to-emerald-600 bg-clip-text text-transparent">
-                  Powered by Autonomous AI.
+                  Powered by AI Agents & Real-Time Analytics.
                 </span>
               </h1>
 

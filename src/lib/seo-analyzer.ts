@@ -24,15 +24,17 @@ export async function analyzeWebsite(targetUrl: string): Promise<SeoReport> {
   try {
     response = await fetch(parsedUrl.href, {
       signal: controller.signal,
+      redirect: "follow",
       headers: {
-        "User-Agent": "Mozilla/5.0 (OpenSEO AI Agent Bot; +https://openseo.dev)",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 OpenSEO/1.0",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
     html = await response.text();
   } catch (err: any) {
     clearTimeout(timeoutId);
-    throw new Error(`Failed to fetch website (${err.message || "Network request failed"}). Make sure the site is publicly reachable.`);
+    const msg = err.name === "AbortError" ? "Request timed out after 12 seconds" : (err.message || "Network request failed");
+    throw new Error(`Failed to fetch website (${msg}). Make sure the URL is valid and publicly reachable.`);
   }
   clearTimeout(timeoutId);
   const loadTimeMs = Date.now() - startTime;
@@ -94,18 +96,25 @@ export async function analyzeWebsite(targetUrl: string): Promise<SeoReport> {
   const bodyText = $("body").text().replace(/\s+/g, " ").trim();
   const wordCount = bodyText ? bodyText.split(" ").length : 0;
 
-  // Check robots.txt & sitemap.xml asynchronously
+  // Check robots.txt & sitemap.xml safely with manual timeout
   let hasRobotsTxt = false;
   let hasSitemap = false;
+
   try {
     const robotsUrl = new URL("/robots.txt", parsedUrl.origin).href;
-    const robotsRes = await fetch(robotsUrl, { method: "HEAD", signal: AbortSignal.timeout(3000) });
+    const rCtrl = new AbortController();
+    const rTid = setTimeout(() => rCtrl.abort(), 3000);
+    const robotsRes = await fetch(robotsUrl, { method: "GET", signal: rCtrl.signal, redirect: "follow" });
+    clearTimeout(rTid);
     hasRobotsTxt = robotsRes.ok;
   } catch {}
 
   try {
     const sitemapUrl = new URL("/sitemap.xml", parsedUrl.origin).href;
-    const sitemapRes = await fetch(sitemapUrl, { method: "HEAD", signal: AbortSignal.timeout(3000) });
+    const sCtrl = new AbortController();
+    const sTid = setTimeout(() => sCtrl.abort(), 3000);
+    const sitemapRes = await fetch(sitemapUrl, { method: "GET", signal: sCtrl.signal, redirect: "follow" });
+    clearTimeout(sTid);
     hasSitemap = sitemapRes.ok;
   } catch {}
 
