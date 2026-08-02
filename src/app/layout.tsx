@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Analytics } from "@vercel/analytics/next"
 
 export const metadata: Metadata = {
   title: "OpenSEO | AI Agent Web SEO Analyzer & Audit Engine",
@@ -20,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="light">
       <body className="min-h-screen bg-[#FBFBFD] text-[#1D1D1F] selection:bg-blue-100 selection:text-blue-900">
+        <Analytics />
         {children}
       </body>
     </html>
